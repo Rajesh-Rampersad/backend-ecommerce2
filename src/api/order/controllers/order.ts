@@ -7,8 +7,8 @@ const stripe = require('stripe')(process.env.STRIPE_KEY);
  * order controller
  */
 
-import { factories } from '@strapi/strapi';
-const { createCoreController } = factories;
+// import { factories } from '@strapi/strapi';
+const { createCoreController } = require ("@strapi/strapi").factories;
 
 module.exports = createCoreController('api::order.order', ({ strapi }) => ({
     async create(ctx) {
@@ -17,6 +17,8 @@ module.exports = createCoreController('api::order.order', ({ strapi }) => ({
         const { products } = ctx.request.body;
 
         try {
+            console.log("producto", products);
+            
             // Validar que los productos existan
             if (!products || !Array.isArray(products)) {
                 ctx.response.status = 400;
@@ -50,7 +52,9 @@ module.exports = createCoreController('api::order.order', ({ strapi }) => ({
                 cancel_url: `${process.env.CLIENT_URL}/cancel`,
             });
 
-            await strapi.service("api::order.order").create({ data: { products, stripeId: session.id } });
+            await strapi
+            .service("api::order.order")
+            .create({ data: { products, stripeId: session.id } });
 
             return { stripeSession: session };
 
